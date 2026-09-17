@@ -13,3 +13,10 @@ yarn-error.log*
 # Sistema Operativo
 .DS_Store
 Thumbs.db
+
+# Archivos privados
+.md/private
+
+# WhatsApp session
+.wwebjs_auth/
+.wwebjs_cache/

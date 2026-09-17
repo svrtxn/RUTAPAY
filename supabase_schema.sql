@@ -6,6 +6,7 @@ CREATE TABLE public.users (
     email TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('CHOFER', 'ADMIN')),
+    password_hash TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -26,27 +27,14 @@ CREATE TABLE public.trips (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     driver_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     amount DECIMAL(10, 2) NOT NULL,
+    origin TEXT,
     destination TEXT,
-    date DATE NOT NULL DEFAULT CURRENT_DATE, -- Fecha específica del viaje
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- =========================================================================
--- DATOS SEMILLA PARA PRUEBAS (Opcional)
+-- MIGRACIÓN: Si ya tenés las tablas creadas, ejecutá esto en vez de todo:
 -- =========================================================================
-
--- Crear Admin y Chofer de prueba
-INSERT INTO public.users (id, email, name, role) 
-VALUES 
-  ('11111111-1111-1111-1111-111111111111', 'admin@rutapay.com', 'Administrador General', 'ADMIN'),
-  ('22222222-2222-2222-2222-222222222222', 'chofer1@rutapay.com', 'Chofer Prueba', 'CHOFER');
-
--- Configuración para Septiembre 2026 (Mes 9, Año 2026)
-INSERT INTO public.monthly_configs (month, year, base_salary, viatics)
-VALUES (9, 2026, 500000.00, 50000.00);
-
--- Crear algunos viajes para el chofer de prueba
-INSERT INTO public.trips (driver_id, amount, destination, date)
-VALUES
-  ('22222222-2222-2222-2222-222222222222', 15000.00, 'Aeropuerto', '2026-09-01'),
-  ('22222222-2222-2222-2222-222222222222', 25000.00, 'Centro', '2026-09-02');
+-- ALTER TABLE public.users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+-- ALTER TABLE public.trips ADD COLUMN IF NOT EXISTS origin TEXT;

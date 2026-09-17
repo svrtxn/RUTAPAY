@@ -1,13 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
+    <!-- figma:head-start -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>RUTAPAY</title>
+    <link rel="icon" type="image/jpeg" href="/icon.jpg" />
+    <!-- figma:head-end -->
   </head>
   <body>
+    <!-- figma:body-start -->
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      document.addEventListener('gesturestart', function (e) {
+        e.preventDefault();
+      });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- figma:body-end -->
   </body>
 </html>
