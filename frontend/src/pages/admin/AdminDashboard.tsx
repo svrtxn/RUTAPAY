@@ -38,7 +38,7 @@ export function AdminDashboard({ onNavigate, onLogout }: { onNavigate: (s: strin
       setDownloading(true);
       const token = localStorage.getItem("rutapay_token");
       const [y, m] = ym.split('-');
-      const res = await fetch(`/api/report/excel/admin?month=${m}&year=${y}`, {
+      const res = await fetch(`/api/report/excel/admin?month=${m}&year=${y}&t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error("Error al descargar");

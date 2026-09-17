@@ -44,7 +44,7 @@ export function History({
       if (!token) return;
       
       const [y, m] = selectedMonth.split('-');
-      const res = await fetch(`/api/report/excel?month=${m}&year=${y}`, {
+      const res = await fetch(`/api/report/excel?month=${m}&year=${y}&t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

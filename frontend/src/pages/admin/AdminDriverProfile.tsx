@@ -47,7 +47,7 @@ export function AdminDriverProfile({ driver, onBack }: { driver: AuthUser; onBac
       setDownloading(true);
       const token = localStorage.getItem("rutapay_token");
       const [y, m] = ym.split('-');
-      const res = await fetch(`/api/report/excel?month=${m}&year=${y}&driver_id=${driver.id}`, {
+      const res = await fetch(`/api/report/excel?month=${m}&year=${y}&driver_id=${driver.id}&t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error("Error al descargar");
