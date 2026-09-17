@@ -152,7 +152,7 @@ export function Dashboard({
                   <p className="text-sm font-semibold text-white">{formatCLP(reportData.baseSalary)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-white/60">Viáticos</p>
+                  <p className="text-xs text-white/60">Viáticos (x Día)</p>
                   <p className="text-sm font-semibold text-white">{formatCLP(reportData.viaticos)}</p>
                 </div>
                 <div>

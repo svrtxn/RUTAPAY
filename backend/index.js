@@ -604,13 +604,14 @@ app.get('/api/report', authMiddleware, async (req, res) => {
 
   const { data: trips, error: tripsError } = await supabase
     .from('trips')
-    .select('amount')
+    .select('amount, date')
     .eq('driver_id', driver_id)
     .gte('date', startDate).lte('date', endDate);
 
   if (tripsError) return res.status(400).json({ error: tripsError.message });
 
   const totalTripsAmount = trips.reduce((acc, trip) => acc + Number(trip.amount), 0);
+  const uniqueDaysWorked = new Set(trips.map(t => String(t.date).substring(0, 10))).size;
 
   const { data: config } = await supabase
     .from('monthly_configs')
@@ -621,8 +622,9 @@ app.get('/api/report', authMiddleware, async (req, res) => {
     .single();
 
   const baseSalary = config ? Number(config.base_salary) : 0;
-  const viatics = config ? Number(config.viatics) : 0;
-  const totalToPay = totalTripsAmount + baseSalary + viatics;
+  const viaticRate = config ? Number(config.viatics) : 0;
+  const totalViatics = viaticRate * uniqueDaysWorked;
+  const totalToPay = totalTripsAmount + baseSalary + totalViatics;
 
   res.json({
     driver_id,
@@ -631,7 +633,8 @@ app.get('/api/report', authMiddleware, async (req, res) => {
     resume: {
       total_trips_amount: totalTripsAmount,
       base_salary: baseSalary,
-      viatics: viatics,
+      viatics: totalViatics,
+      viatics_details: { days: uniqueDaysWorked, rate: viaticRate },
       total_to_pay: totalToPay,
     },
   });
@@ -653,7 +656,7 @@ app.get('/api/report/global', authMiddleware, async (req, res) => {
   // Todos los viajes del mes
   const { data: allTrips, error: tripsError } = await supabase
     .from('trips')
-    .select('amount')
+    .select('driver_id, amount, date')
     .gte('date', startDate).lte('date', endDate);
 
   if (tripsError) return res.status(400).json({ error: tripsError.message });
@@ -662,14 +665,21 @@ app.get('/api/report/global', authMiddleware, async (req, res) => {
   // Todas las configuraciones del mes
   const { data: allConfigs, error: configsError } = await supabase
     .from('monthly_configs')
-    .select('base_salary, viatics')
+    .select('driver_id, base_salary, viatics')
     .eq('month', parseInt(month, 10))
     .eq('year', parseInt(year, 10));
 
   if (configsError) return res.status(400).json({ error: configsError.message });
   
   const globalBaseSalary = allConfigs.reduce((acc, c) => acc + Number(c.base_salary), 0);
-  const globalViatics = allConfigs.reduce((acc, c) => acc + Number(c.viatics), 0);
+  
+  // Calcular viáticos por chofer
+  let globalViatics = 0;
+  for (const config of allConfigs) {
+    const driverTrips = allTrips.filter(t => t.driver_id === config.driver_id);
+    const uniqueDays = new Set(driverTrips.map(t => String(t.date).substring(0, 10))).size;
+    globalViatics += uniqueDays * (Number(config.viatics) || 0);
+  }
   
   const globalTotalToPay = globalTripsAmount + globalBaseSalary + globalViatics;
 
@@ -709,6 +719,7 @@ app.get('/api/report/excel', authMiddleware, async (req, res) => {
   if (tripsError) return res.status(400).json({ error: tripsError.message });
 
   const totalTripsAmount = trips.reduce((acc, trip) => acc + Number(trip.amount), 0);
+  const uniqueDaysWorked = new Set(trips.map(t => String(t.date).substring(0, 10))).size;
 
   // 2. Obtener config del mes
   const { data: config } = await supabase
@@ -720,7 +731,8 @@ app.get('/api/report/excel', authMiddleware, async (req, res) => {
     .single();
 
   const baseSalary = config ? Number(config.base_salary) : 0;
-  const viatics = config ? Number(config.viatics) : 0;
+  const viaticRate = config ? Number(config.viatics) : 0;
+  const viatics = viaticRate * uniqueDaysWorked;
   const totalToPay = totalTripsAmount + baseSalary + viatics;
 
   // 3. Crear archivo Excel
@@ -804,7 +816,8 @@ app.get('/api/report/excel', authMiddleware, async (req, res) => {
   });
   borderRows.push(rowTotalPagar);
 
-  const rowViaticos = sheet.addRow(['', 'Viaticos', 'total', viatics]);
+  const viaticLabel = viaticRate > 0 ? `Viáticos (${uniqueDaysWorked} días x ${viaticRate.toLocaleString('es-CL')})` : 'Viaticos';
+  const rowViaticos = sheet.addRow(['', viaticLabel, 'total', viatics]);
   borderRows.push(rowViaticos);
 
   const rowTotalFinal = sheet.addRow(['', '', 'total', { formula: `D${rowTotalPagar.number}+D${rowViaticos.number}` }]);
@@ -872,6 +885,7 @@ app.get('/api/report/excel/admin', authMiddleware, async (req, res) => {
       .order('date', { ascending: false });
 
     const totalTripsAmount = (trips || []).reduce((acc, t) => acc + Number(t.amount), 0);
+    const uniqueDaysWorked = new Set((trips || []).map(t => String(t.date).substring(0, 10))).size;
 
     // Config
     const { data: config } = await supabase
@@ -883,8 +897,9 @@ app.get('/api/report/excel/admin', authMiddleware, async (req, res) => {
       .single();
 
     const baseSalary = config ? Number(config.base_salary) : 0;
-    const viatics = config ? Number(config.viatics) : 0;
-    const totalToPay = totalTripsAmount + baseSalary;
+    const viaticRate = config ? Number(config.viatics) : 0;
+    const viatics = viaticRate * uniqueDaysWorked;
+    const totalToPay = totalTripsAmount + baseSalary + viatics;
 
     // Crear hoja por chofer. Si no tiene nombre, usa "Chofer - Email"
     const displayName = driver.name ? driver.name : `Chofer ${driver.email.split('@')[0]}`;
@@ -955,7 +970,8 @@ app.get('/api/report/excel/admin', authMiddleware, async (req, res) => {
     });
     borderRows.push(rowTotalPagar);
 
-    const rowViaticos = sheet.addRow(['', 'Viaticos', 'total', viatics]);
+    const viaticLabel = viaticRate > 0 ? `Viáticos (${uniqueDaysWorked} días x ${viaticRate.toLocaleString('es-CL')})` : 'Viaticos';
+    const rowViaticos = sheet.addRow(['', viaticLabel, 'total', viatics]);
     borderRows.push(rowViaticos);
 
     const rowTotalFinal = sheet.addRow(['', '', 'total', { formula: `D${rowTotalPagar.number}+D${rowViaticos.number}` }]);
