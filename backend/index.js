@@ -756,22 +756,21 @@ app.get('/api/report/excel', authMiddleware, async (req, res) => {
         filename: logoPath,
         extension: 'jpeg',
       });
-      // Posicionar el logo usando celdas para que no se deforme (ocupa A1:D4)
+      // Posicionar con tamaño fijo para no deformar
       sheet.addImage(logoId, {
-        tl: { col: 0, row: 0 },
-        br: { col: 4, row: 4 }
+        tl: { col: 0.5, row: 0.5 }, // Ligero margen en A1
+        ext: { width: 450, height: 90 } // Tamaño proporcional fijo
       });
     }
   } catch (e) {
     console.error("Error al cargar logo en excel:", e);
   }
 
-  // 4 filas vacías para el logo
+  // Dejar espacio para el logo
   sheet.addRow(['', '', '', '']);
+  sheet.getRow(1).height = 80; // Darle altura a la fila del logo
+  sheet.mergeCells('A1:D1');
   sheet.addRow(['', '', '', '']);
-  sheet.addRow(['', '', '', '']);
-  sheet.addRow(['', '', '', '']);
-  sheet.mergeCells('A1:D4');
 
   sheet.addRow(['Chofer:', req.user.name || req.user.email, '', '']);
   sheet.addRow(['', '', '', '']);
@@ -920,17 +919,16 @@ app.get('/api/report/excel/admin', authMiddleware, async (req, res) => {
       if (fs.existsSync(logoPath)) {
         const logoId = workbook.addImage({ filename: logoPath, extension: 'jpeg' });
         sheet.addImage(logoId, {
-          tl: { col: 0, row: 0 },
-          br: { col: 4, row: 4 }
+          tl: { col: 0.5, row: 0.5 },
+          ext: { width: 450, height: 90 }
         });
       }
     } catch (e) {}
 
     sheet.addRow(['', '', '', '']);
+    sheet.getRow(1).height = 80;
+    sheet.mergeCells('A1:D1');
     sheet.addRow(['', '', '', '']);
-    sheet.addRow(['', '', '', '']);
-    sheet.addRow(['', '', '', '']);
-    sheet.mergeCells('A1:D4');
     
     sheet.addRow(['Chofer:', driver.name || driver.email, '', '']);
     sheet.addRow(['', '', '', '']);
