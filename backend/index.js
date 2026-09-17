@@ -7,8 +7,7 @@ const jwt = require('jsonwebtoken');
 const ExcelJS = require('exceljs');
 const fs = require('fs');
 const path = require('path');
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+// WhatsApp disabled for Render deployment
 
 const app = express();
 app.use(cors());
@@ -29,113 +28,9 @@ if (supabaseUrl && supabaseKey) {
   console.warn('⚠️ Falta configurar SUPABASE_URL y/o SUPABASE_KEY en el archivo .env');
 }
 
-// Buscamos Chrome o Edge instalado en el sistema
-let browserExecutablePath = null;
-const paths = [
-  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-  'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
-];
-
-for (const p of paths) {
-  if (fs.existsSync(p)) {
-    browserExecutablePath = p;
-    break;
-  }
-}
-
-// WhatsApp Config
+// WhatsApp Mock (Disabled)
 let whatsappClient = null;
 let whatsappReady = false;
-
-function createWhatsAppClient() {
-  const client = new Client({
-    authStrategy: new LocalAuth(),
-    authTimeoutMs: 120000,
-    webVersionCache: {
-      type: 'none'
-    },
-    puppeteer: { 
-      headless: true,
-      args: [
-        '--no-sandbox', 
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--disable-gpu',
-        '--disable-features=IsolateOrigins,site-per-process'
-      ],
-      executablePath: browserExecutablePath
-    }
-  });
-
-  client.on('qr', async (qr) => {
-    let botPhone = process.env.WHATSAPP_BOT_PHONE;
-    if (botPhone) {
-        botPhone = botPhone.replace(/\D/g, '');
-        console.log(`\n📲 Solicitando código de emparejamiento para el número: ${botPhone}`);
-        try {
-            const code = await client.requestPairingCode(botPhone);
-            console.log('\n=============================================');
-            console.log(`TU CÓDIGO DE EMPAREJAMIENTO ES:  ${code}`);
-            console.log('Ve a WhatsApp > Dispositivos Vinculados > Vincular con el número de teléfono');
-            console.log('Ingresa este código para iniciar sesión.');
-            console.log('=============================================\n');
-        } catch (error) {
-            console.error('Error al pedir el código de emparejamiento:', error.message);
-        }
-    } else {
-        console.log('=============================================');
-        console.log('SCAN THIS QR CODE CON TU WHATSAPP (RutaPay):');
-        qrcode.generate(qr, {small: true});
-        console.log('=============================================');
-        console.log('💡 TIP: Si no puedes escanear el QR, puedes vincular por código.');
-        console.log('Solo agrega WHATSAPP_BOT_PHONE="+569TU_NUMERO" en tu archivo .env y reinicia.');
-    }
-  });
-
-  client.on('ready', () => {
-    whatsappReady = true;
-    console.log('✅ WhatsApp Client is ready!');
-  });
-
-  client.on('disconnected', (reason) => {
-    whatsappReady = false;
-    console.log('⚠️ WhatsApp desconectado:', reason);
-  });
-
-  return client;
-}
-
-async function initWhatsApp(maxRetries = 5) {
-  console.log('⏳ Inicializando WhatsApp, por favor espera...');
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      whatsappClient = createWhatsAppClient();
-      await whatsappClient.initialize();
-      console.log('🟢 WhatsApp inicializado correctamente.');
-      return; // Éxito, salimos
-    } catch (err) {
-      console.error(`❌ Intento ${attempt}/${maxRetries} falló: ${err.message}`);
-      // Intentar destruir el cliente roto antes de reintentar
-      try { await whatsappClient.destroy(); } catch (_) {}
-      if (attempt < maxRetries) {
-        const waitSec = attempt * 3;
-        console.log(`⏳ Reintentando en ${waitSec} segundos...`);
-        await new Promise(r => setTimeout(r, waitSec * 1000));
-      } else {
-        console.error('🔴 No se pudo conectar a WhatsApp después de todos los intentos.');
-        console.error('   El servidor seguirá corriendo SIN WhatsApp.');
-        console.error('   Los mensajes se guardarán pero no se enviarán.');
-      }
-    }
-  }
-}
-
-// Iniciar WhatsApp en segundo plano (no bloquea el servidor)
-initWhatsApp();
 
 
 // ========================
