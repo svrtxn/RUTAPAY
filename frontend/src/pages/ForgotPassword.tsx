@@ -71,7 +71,7 @@ export function ForgotPassword({ onBack }: { onBack: () => void }) {
 
         {/* Circle Logo */}
         <div className="w-32 h-32 mb-8 mt-2 rounded-[32px] overflow-hidden bg-white flex items-center justify-center">
-          <img src="/icon.jpg" alt="RutaPay Icon" className="w-full h-full object-contain" />
+          <img src="https://i.postimg.cc/cCkQY6LH/icon.jpg" alt="RutaPay Icon" className="w-full h-full object-contain" />
         </div>
 
         <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">Recuperar Clave</h2>
