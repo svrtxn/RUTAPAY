@@ -802,25 +802,27 @@ app.get('/api/report/excel', authMiddleware, async (req, res) => {
     dataEndRow++;
   });
 
-  // Totales usando Fórmulas
-  const totalTripsFormula = dataEndRow >= dataStartRow ? { formula: `SUM(D${dataStartRow}:D${dataEndRow})` } : 0;
-  const rowTotal = sheet.addRow(['', '', 'Total', totalTripsFormula]);
+  // Totales estáticos para evitar problemas de compatibilidad con fórmulas en algunos visores
+  const rowTotal = sheet.addRow(['', '', 'Total Viajes', totalTripsAmount]);
   borderRows.push(rowTotal);
 
   const rowSueldo = sheet.addRow(['', 'Sueldo Proporcional', '', baseSalary]);
   borderRows.push(rowSueldo);
 
-  const rowTotalPagar = sheet.addRow(['', 'total a pagar', '', { formula: `D${rowTotal.number}+D${rowSueldo.number}` }]);
+  const rowTotalParcial = sheet.addRow(['', 'Total Sueldo + Viajes', '', totalTripsAmount + baseSalary]);
   ['A', 'B', 'C', 'D'].forEach(col => {
-    rowTotalPagar.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD5E8D4' } }; // Verde claro
+    rowTotalParcial.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD5E8D4' } }; // Verde claro
   });
-  borderRows.push(rowTotalPagar);
+  borderRows.push(rowTotalParcial);
 
   const viaticLabel = viaticRate > 0 ? `Viáticos (${uniqueDaysWorked} días x ${viaticRate.toLocaleString('es-CL')})` : 'Viaticos';
-  const rowViaticos = sheet.addRow(['', viaticLabel, 'total', viatics]);
+  const rowViaticos = sheet.addRow(['', viaticLabel, 'Total', viatics]);
   borderRows.push(rowViaticos);
 
-  const rowTotalFinal = sheet.addRow(['', '', 'total', { formula: `D${rowTotalPagar.number}+D${rowViaticos.number}` }]);
+  const rowTotalFinal = sheet.addRow(['', '', 'TOTAL FINAL A PAGAR', totalToPay]);
+  ['A', 'B', 'C', 'D'].forEach(col => {
+    rowTotalFinal.getCell(col).font = { bold: true };
+  });
   borderRows.push(rowTotalFinal);
 
   // Aplicar bordes a todas las celdas de la tabla
@@ -957,24 +959,27 @@ app.get('/api/report/excel/admin', authMiddleware, async (req, res) => {
       dataEndRow++;
     });
 
-    const totalTripsFormula = dataEndRow >= dataStartRow ? { formula: `SUM(D${dataStartRow}:D${dataEndRow})` } : 0;
-    const rowTotal = sheet.addRow(['', '', 'Total', totalTripsFormula]);
+    // Totales estáticos para el admin
+    const rowTotal = sheet.addRow(['', '', 'Total Viajes', totalTripsAmount]);
     borderRows.push(rowTotal);
 
     const rowSueldo = sheet.addRow(['', 'Sueldo Proporcional', '', baseSalary]);
     borderRows.push(rowSueldo);
 
-    const rowTotalPagar = sheet.addRow(['', 'total a pagar', '', { formula: `D${rowTotal.number}+D${rowSueldo.number}` }]);
+    const rowTotalParcial = sheet.addRow(['', 'Total Sueldo + Viajes', '', totalTripsAmount + baseSalary]);
     ['A', 'B', 'C', 'D'].forEach(col => {
-      rowTotalPagar.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD5E8D4' } };
+      rowTotalParcial.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD5E8D4' } };
     });
-    borderRows.push(rowTotalPagar);
+    borderRows.push(rowTotalParcial);
 
     const viaticLabel = viaticRate > 0 ? `Viáticos (${uniqueDaysWorked} días x ${viaticRate.toLocaleString('es-CL')})` : 'Viaticos';
-    const rowViaticos = sheet.addRow(['', viaticLabel, 'total', viatics]);
+    const rowViaticos = sheet.addRow(['', viaticLabel, 'Total', viatics]);
     borderRows.push(rowViaticos);
 
-    const rowTotalFinal = sheet.addRow(['', '', 'total', { formula: `D${rowTotalPagar.number}+D${rowViaticos.number}` }]);
+    const rowTotalFinal = sheet.addRow(['', '', 'TOTAL FINAL A PAGAR', totalToPay]);
+    ['A', 'B', 'C', 'D'].forEach(col => {
+      rowTotalFinal.getCell(col).font = { bold: true };
+    });
     borderRows.push(rowTotalFinal);
 
     borderRows.forEach(row => {
