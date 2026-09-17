@@ -256,7 +256,9 @@ export function AdminDrivers({ onBack }: { onBack: () => void }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Viáticos Fijos</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Tarifa Viático (Por día trabajado)
+                </label>
                 <input 
                   type="text" 
                   inputMode="numeric"

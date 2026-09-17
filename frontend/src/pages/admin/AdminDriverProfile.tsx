@@ -102,7 +102,7 @@ export function AdminDriverProfile({ driver, onBack }: { driver: AuthUser; onBac
               <p className="text-xl font-bold">{formatCLP(resume.base_salary)}</p>
             </div>
             <div className="bg-card border rounded-2xl p-4 shadow-sm" style={{ borderColor: "var(--border)" }}>
-              <p className="text-xs text-muted-foreground mb-1">Viáticos</p>
+              <p className="text-xs text-muted-foreground mb-1">Viáticos (x Día)</p>
               <p className="text-xl font-bold">{formatCLP(resume.viatics)}</p>
             </div>
             <div className="rounded-2xl p-4 shadow-sm text-white" style={{ background: "linear-gradient(135deg, #2D5A3D 0%, #4A7C59 100%)" }}>

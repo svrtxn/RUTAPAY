@@ -112,7 +112,7 @@ export function AdminDashboard({ onNavigate, onLogout }: { onNavigate: (s: strin
               <p className="text-sm font-semibold text-white">{loading ? "..." : formatCLP(globalData.base_salary)}</p>
             </div>
             <div>
-              <p className="text-xs text-white/60">Viáticos</p>
+              <p className="text-xs text-white/60">Viáticos (x Día)</p>
               <p className="text-sm font-semibold text-white">{loading ? "..." : formatCLP(globalData.viatics)}</p>
             </div>
             <div>
