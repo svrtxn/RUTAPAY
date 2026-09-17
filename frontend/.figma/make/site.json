@@ -1,7 +1,11 @@
 {
-  "description": "Enables drivers to log trips and track monthly payments with an intuitive dashboard, quick entry forms, and detailed travel history for financial control.",
+  "title": "RutaPay",
+  "description": "Sistema integral de control de viajes, viáticos y pagos para choferes.",
+  "openGraph": {
+    "image": "https://i.postimg.cc/4xDQBKb7/logo.jpg"
+  },
   "robots": {
-    "index": false
+    "index": true
   },
   "accessibility": {
     "addBypassLinks": false,
