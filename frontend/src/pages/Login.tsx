@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { AuthUser } from "../types";
 import { User, Lock, Eye, EyeOff, Phone } from "lucide-react";
-import iconUrl from "../../public/icon.jpg";
 
 export function Login({
   onLogin,
@@ -99,7 +98,7 @@ export function Login({
         
         {/* Circle Logo */}
         <div className="w-32 h-32 mb-8 mt-2 rounded-[32px] overflow-hidden bg-white flex items-center justify-center">
-          <img src={iconUrl} alt="RutaPay Icon" className="w-full h-full object-contain" />
+          <img src="/icon.jpg" alt="RutaPay Icon" className="w-40 h-auto object-contain mix-blend-multiply" />
         </div>
 
         {/* Content */}

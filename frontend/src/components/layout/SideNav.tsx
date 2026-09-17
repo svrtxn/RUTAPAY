@@ -1,6 +1,5 @@
 import { Screen } from "../../types";
 import { LayoutDashboard, PlusCircle, History, LogOut, Settings as SettingsIcon, Users } from "lucide-react";
-import logoUrl from "../../../public/logo.jpg";
 
 export function SideNav({
   active,
@@ -16,7 +15,7 @@ export function SideNav({
   return (
     <nav className="hidden md:flex flex-col w-64 h-full border-r bg-card p-6" style={{ borderColor: "var(--border)" }}>
       <div className="flex items-center gap-3 mb-10 pl-2">
-        <img src={logoUrl} alt="RutaPay Logo" className="w-40 h-auto object-contain mix-blend-multiply" />
+        <img src="/logo.jpg" alt="RutaPay Logo" className="w-40 h-auto object-contain mix-blend-multiply" />
       </div>
 
       <div className="flex flex-col gap-2 flex-1">

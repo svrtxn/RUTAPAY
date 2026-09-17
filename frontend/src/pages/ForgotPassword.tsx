@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Phone, User } from "lucide-react";
-import iconUrl from "../../public/icon.jpg";
+import { ArrowLeft, Phone, User, Loader2, Mail } from "lucide-react";
 
 export function ForgotPassword({ onBack }: { onBack: () => void }) {
   const [identifier, setIdentifier] = useState("");
@@ -71,8 +70,8 @@ export function ForgotPassword({ onBack }: { onBack: () => void }) {
         </button>
 
         {/* Circle Logo */}
-        <div className="w-24 h-24 mx-auto mb-6 rounded-3xl overflow-hidden bg-white flex items-center justify-center">
-          <img src={iconUrl} alt="RutaPay Icon" className="w-full h-full object-contain" />
+        <div className="w-32 h-32 mb-8 mt-2 rounded-[32px] overflow-hidden bg-white flex items-center justify-center">
+          <img src="/icon.jpg" alt="RutaPay Icon" className="w-full h-full object-contain" />
         </div>
 
         <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">Recuperar Clave</h2>
